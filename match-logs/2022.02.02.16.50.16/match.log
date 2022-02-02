@@ -1,0 +1,41 @@
+16:50:16,951 INFO Instantiating local player A - Brendan with bot ./starter-bots/javascript/
+16:50:16,956 INFO Instantiating local player B - CoffeeRef with bot ./reference-bot/java/target
+16:50:17,298 INFO Starting game
+16:50:17,300 INFO ******************************************************************************************************
+16:50:17,300 INFO Starting round: 1
+16:50:17,301 INFO Player A - Brendan: Map View 
+16:50:17,315 INFO ======================================================================================================
+round:1
+player: id:1 position: y:1 x:1 speed:5 state:READY statesThatOccurredThisRound:READY boosting:false boost-counter:0 damage:0 score:0 powerups: 
+opponent: id:2 position: y:4 x:1 speed:5
+
+[1░░░░░░░░░░░░░░░░░░░░]
+[░░░░░░░░░▓░░░░░░░░░░░]
+[░░░░░░░░░░░░*░░░░░░░░]
+[2░░░░░#░▓░░░░░░░░░░░░]
+======================================================================================================
+16:50:17,313 ERROR Bot process failed
+org.apache.commons.exec.ExecuteException: Execution failed (Exit value: -559038737. Caused by java.io.IOException: Cannot run program "node" (in directory "C:\Users\Erik\Desktop\starter-pack\starter-bots\javascript"): CreateProcess error=2, The system cannot find the file specified)
+	at org.apache.commons.exec.DefaultExecutor$1.run(DefaultExecutor.java:205) [game-runner-jar-with-dependencies.jar:?]
+	at java.lang.Thread.run(Unknown Source) [?:1.8.0_321]
+Caused by: java.io.IOException: Cannot run program "node" (in directory "C:\Users\Erik\Desktop\starter-pack\starter-bots\javascript"): CreateProcess error=2, The system cannot find the file specified
+	at java.lang.ProcessBuilder.start(Unknown Source) ~[?:1.8.0_321]
+	at java.lang.Runtime.exec(Unknown Source) ~[?:1.8.0_321]
+	at org.apache.commons.exec.launcher.Java13CommandLauncher.exec(Java13CommandLauncher.java:61) ~[game-runner-jar-with-dependencies.jar:?]
+	at org.apache.commons.exec.DefaultExecutor.launch(DefaultExecutor.java:279) ~[game-runner-jar-with-dependencies.jar:?]
+	at org.apache.commons.exec.DefaultExecutor.executeInternal(DefaultExecutor.java:336) ~[game-runner-jar-with-dependencies.jar:?]
+	at org.apache.commons.exec.DefaultExecutor.access$200(DefaultExecutor.java:48) ~[game-runner-jar-with-dependencies.jar:?]
+	at org.apache.commons.exec.DefaultExecutor$1.run(DefaultExecutor.java:200) ~[game-runner-jar-with-dependencies.jar:?]
+	... 1 more
+Caused by: java.io.IOException: CreateProcess error=2, The system cannot find the file specified
+	at java.lang.ProcessImpl.create(Native Method) ~[?:1.8.0_321]
+	at java.lang.ProcessImpl.<init>(Unknown Source) ~[?:1.8.0_321]
+	at java.lang.ProcessImpl.start(Unknown Source) ~[?:1.8.0_321]
+	at java.lang.ProcessBuilder.start(Unknown Source) ~[?:1.8.0_321]
+	at java.lang.Runtime.exec(Unknown Source) ~[?:1.8.0_321]
+	at org.apache.commons.exec.launcher.Java13CommandLauncher.exec(Java13CommandLauncher.java:61) ~[game-runner-jar-with-dependencies.jar:?]
+	at org.apache.commons.exec.DefaultExecutor.launch(DefaultExecutor.java:279) ~[game-runner-jar-with-dependencies.jar:?]
+	at org.apache.commons.exec.DefaultExecutor.executeInternal(DefaultExecutor.java:336) ~[game-runner-jar-with-dependencies.jar:?]
+	at org.apache.commons.exec.DefaultExecutor.access$200(DefaultExecutor.java:48) ~[game-runner-jar-with-dependencies.jar:?]
+	at org.apache.commons.exec.DefaultExecutor$1.run(DefaultExecutor.java:200) ~[game-runner-jar-with-dependencies.jar:?]
+	... 1 more

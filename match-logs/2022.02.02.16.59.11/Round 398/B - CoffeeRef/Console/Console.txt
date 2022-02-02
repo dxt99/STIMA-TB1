@@ -1,0 +1,10 @@
+======================================================================================================
+round:398
+player: id:2 position: y:4 x:1498 speed:6 state:ACCELERATING statesThatOccurredThisRound:ACCELERATING boosting:true boost-counter:4 damage:3 score:78 powerups: OIL:11, EMP:10, TWEET:25
+opponent: id:1 position: y:3 x:87 speed:0
+
+[░░░░░░░║]
+[░░░░░░░║]
+[░░░░░░░║]
+[░░░░░2░║]
+======================================================================================================
