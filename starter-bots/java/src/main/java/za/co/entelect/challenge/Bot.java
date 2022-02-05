@@ -5,6 +5,7 @@ import za.co.entelect.challenge.entities.*;
 import za.co.entelect.challenge.enums.PowerUps;
 import za.co.entelect.challenge.enums.Terrain;
 
+import javax.swing.event.ChangeEvent;
 import java.util.*;
 
 import static java.lang.Math.max;
@@ -35,24 +36,27 @@ public class Bot {
         List<Object> right  = getBlocksInFront(myCar.position.lane+1, myCar.position.block, myCar.speed-1);
         List<Object> left  = getBlocksInFront(myCar.position.lane-1, myCar.position.block, myCar.speed-1);
 
-        //basic fix logic
-        if (myCar.damage >= 3) {
-            return new FixCommand();
-        }
+        //lizard logic if tailing opponent
+        if(IsCrashing()&&hasPowerUp(PowerUps.LIZARD, myCar.powerups))return new LizardCommand();
+
+        //basic fix logic (ada temporary addon, sepertinya tambah cepat)
+        if(myCar.damage >= 3)return new FixCommand();
+        if(myCar.damage>=1&&hasPowerUp(PowerUps.BOOST, myCar.powerups))return new FixCommand();
 
         //wall avoidance logic:
         //1. continue if lane doesn't contain wall
         //2. turn left/right immediately if lane is empty
         //3. use lizard (avoids wall)
+        // edge case: all wall
         if(middle.contains(Terrain.WALL)){
             if(!(right.contains(Terrain.WALL)||left.contains(Terrain.WALL))){
                 //checks for power up
                 if(right.contains(Terrain.BOOST))return new ChangeLaneCommand(1);
                 if(left.contains(Terrain.BOOST))return new ChangeLaneCommand(0);
-                if(right.contains(Terrain.EMP))return new ChangeLaneCommand(1);
-                if(left.contains(Terrain.EMP))return new ChangeLaneCommand(0);
                 if(right.contains(Terrain.LIZARD))return new ChangeLaneCommand(1);
                 if(left.contains(Terrain.LIZARD))return new ChangeLaneCommand(0);
+                if(right.contains(Terrain.EMP))return new ChangeLaneCommand(1);
+                if(left.contains(Terrain.EMP))return new ChangeLaneCommand(0);
                 if(right.contains(Terrain.TWEET))return new ChangeLaneCommand(1);
                 if(left.contains(Terrain.TWEET))return new ChangeLaneCommand(0);
                 if(right.contains(Terrain.OIL_POWER))return new ChangeLaneCommand(1);
@@ -67,23 +71,62 @@ public class Bot {
 
         //default power ups usage, delete later
 
-        if (hasPowerUp(PowerUps.BOOST, myCar.powerups)) {
+        if (myCar.damage==0&&LaneClean(middle)&&hasPowerUp(PowerUps.BOOST, myCar.powerups)){
             return new BoostCommand();
         }
-        if (hasPowerUp(PowerUps.EMP, myCar.powerups)){
+        if (myCar.position.block<opponent.position.block&&hasPowerUp(PowerUps.EMP, myCar.powerups)){
             return new EmpCommand();
         }
+        /*
         if (hasPowerUp(PowerUps.LIZARD, myCar.powerups)){
             return new LizardCommand();
         }
         if (hasPowerUp(PowerUps.OIL, myCar.powerups)){
             return new OilCommand();
         }
+        */
         if (hasPowerUp(PowerUps.TWEET, myCar.powerups)){
-            return new TweetCommand(opponent.position.lane,opponent.position.block+1);
+            return new TweetCommand(opponent.position.lane,opponent.position.block+opponent.speed+1);
         }
 
-        return new AccelerateCommand(); //default accel
+        //obstacle logic (wall handled above)
+        //1. if all three lanes has walls, check for lizard
+        //2. continue if lane is clean and not crashing to opponent
+        //3. if exists clean lane (left/right), steer
+        //4. use lizard if no clean lane, if none just accel
+        if(middle.contains(Terrain.WALL)&&left.contains(Terrain.WALL)&&right.contains(Terrain.WALL)&&hasPowerUp(PowerUps.LIZARD, myCar.powerups)){
+               return new LizardCommand();
+        }else if(!LaneClean(middle)){
+            if(LaneClean(left)&&LaneClean(right)&&!IsCrashing()){
+                //checks for power up
+                if(right.contains(Terrain.BOOST))return new ChangeLaneCommand(1);
+                if(left.contains(Terrain.BOOST))return new ChangeLaneCommand(0);
+                if(right.contains(Terrain.LIZARD))return new ChangeLaneCommand(1);
+                if(left.contains(Terrain.LIZARD))return new ChangeLaneCommand(0);
+                if(right.contains(Terrain.EMP))return new ChangeLaneCommand(1);
+                if(left.contains(Terrain.EMP))return new ChangeLaneCommand(0);
+                if(right.contains(Terrain.TWEET))return new ChangeLaneCommand(1);
+                if(left.contains(Terrain.TWEET))return new ChangeLaneCommand(0);
+                if(right.contains(Terrain.OIL_POWER))return new ChangeLaneCommand(1);
+                if(left.contains(Terrain.OIL_POWER))return new ChangeLaneCommand(0);
+                if(myCar.position.lane==1||myCar.position.lane==2)return new ChangeLaneCommand(1);
+                return new ChangeLaneCommand(0);
+            }
+            if(LaneClean(left))return new ChangeLaneCommand(0);
+            if(LaneClean(right))return new ChangeLaneCommand(1);
+            //all hopes lost, use lizard
+            if(hasPowerUp(PowerUps.LIZARD, myCar.powerups))return new LizardCommand();
+            //otherwise, just surrender
+        }
+
+        //Oil Logic
+        //1. Max speed and has powerup
+        if((myCar.speed==9||myCar.speed==15)&&hasPowerUp(PowerUps.OIL, myCar.powerups)){
+            return new OilCommand();
+        }
+
+        //just floor the pedal
+        return new AccelerateCommand();
     }
 
     /**
@@ -120,6 +163,21 @@ public class Bot {
             }
         }
         return false;
+    }
+
+    // Checks if lane is clear
+    private Boolean LaneClean(List<Object> LaneBlocks){
+        if(LaneBlocks.contains(Terrain.WALL))return false;
+        if(LaneBlocks.contains(Terrain.MUD))return false;
+        if(LaneBlocks.contains(Terrain.OIL_SPILL))return false;
+        return true;
+    }
+
+    // Checks if crashing to opponent
+    private Boolean IsCrashing(){
+        int dist = max(0,myCar.position.block-opponent.position.block);
+        Boolean same = myCar.position.lane==opponent.position.lane;
+        return same&&(dist<=myCar.speed-opponent.speed);
     }
 
 }
