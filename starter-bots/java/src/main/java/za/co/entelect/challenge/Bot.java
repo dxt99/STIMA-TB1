@@ -2,6 +2,7 @@ package za.co.entelect.challenge;
 
 import za.co.entelect.challenge.command.*;
 import za.co.entelect.challenge.entities.*;
+import za.co.entelect.challenge.enums.PowerUps;
 import za.co.entelect.challenge.enums.Terrain;
 
 import java.util.*;
@@ -31,12 +32,23 @@ public class Bot {
 
     public Command run() {
         List<Object> blocks = getBlocksInFront(myCar.position.lane, myCar.position.block);
-        if (myCar.damage >= 5) {
+        if (myCar.damage >= 2) {
             return new FixCommand();
         }
-        if (blocks.contains(Terrain.MUD)) {
-            int i = random.nextInt(directionList.size());
-            return new ChangeLaneCommand(directionList.get(i));
+        if (hasPowerUp(PowerUps.BOOST, myCar.powerups)) {
+            return new BoostCommand();
+        }
+        if (hasPowerUp(PowerUps.EMP, myCar.powerups)){
+            return new EmpCommand();
+        }
+        if (hasPowerUp(PowerUps.OIL, myCar.powerups)){
+            return new OilCommand();
+        }
+        if (hasPowerUp(PowerUps.LIZARD, myCar.powerups)){
+            return new LizardCommand();
+        }
+        if (hasPowerUp(PowerUps.TWEET, myCar.powerups)){
+            return new TweetCommand(opponent.position.lane,opponent.position.block+1);
         }
         return new AccelerateCommand();
     }
@@ -60,6 +72,14 @@ public class Bot {
 
         }
         return blocks;
+    }
+    private Boolean hasPowerUp(PowerUps powerUpToCheck, PowerUps[] available) {
+        for (PowerUps powerUp: available) {
+            if (powerUp.equals(powerUpToCheck)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }
