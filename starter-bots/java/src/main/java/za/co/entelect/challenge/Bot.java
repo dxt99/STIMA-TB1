@@ -133,6 +133,7 @@ public class Bot {
      * Returns map of blocks and the objects in the for the current lanes, returns the amount of blocks that can be
      * traversed at max speed.
      * Returns wall if lane is not valid
+     * Treats CyberTrucks as walls
      **/
     private List<Object> getBlocksInFront(int lane, int block,int speed) {
         List<Lane[]> map = gameState.lanes;
@@ -150,7 +151,7 @@ public class Bot {
             if (laneList[i] == null || laneList[i].terrain == Terrain.FINISH) {
                 break;
             }
-
+            if(laneList[i].isOccupiedByCyberTruck)blocks.add(Terrain.WALL);
             blocks.add(laneList[i].terrain);
 
         }
