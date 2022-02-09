@@ -90,18 +90,6 @@ public class Bot {
         if (myCar.position.block<opponent.position.block&&hasPowerUp(PowerUps.EMP, myCar.powerups)){
             return new EmpCommand();
         }
-        /*
-        if (hasPowerUp(PowerUps.LIZARD, myCar.powerups)){
-            return new LizardCommand();
-        }
-        if (hasPowerUp(PowerUps.OIL, myCar.powerups)){
-            return new OilCommand();
-        }
-
-        if (hasPowerUp(PowerUps.TWEET, myCar.powerups)){
-            return new TweetCommand(opponent.position.lane,opponent.position.block+opponent.speed+1);
-        }
-        */
 
         //obstacle logic (wall handled above)
         //1. if all three lanes has walls, check for lizard
