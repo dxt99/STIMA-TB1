@@ -36,6 +36,19 @@ public class Bot {
         List<Object> right  = getBlocksInFront(myCar.position.lane+1, myCar.position.block, myCar.speed-1);
         List<Object> left  = getBlocksInFront(myCar.position.lane-1, myCar.position.block, myCar.speed-1);
 
+        // boosting logic
+        if (myCar.boostCounter > 0){
+            if (!LaneClean(middle)) {
+                if (LaneClean(right)) {
+                    return new ChangeLaneCommand(1);
+                } else if (LaneClean(left)) {
+                    return new ChangeLaneCommand(0);
+                } else if (hasPowerUp(PowerUps.LIZARD, myCar.powerups)) {
+                    return new LizardCommand();
+                }
+            }
+        }
+
         //lizard logic if tailing opponent
         if(IsCrashing()&&hasPowerUp(PowerUps.LIZARD, myCar.powerups))return new LizardCommand();
 
@@ -71,7 +84,7 @@ public class Bot {
 
         //default power ups usage, delete later
 
-        if (myCar.damage==0&&LaneClean(middle)&&hasPowerUp(PowerUps.BOOST, myCar.powerups)){
+        if (myCar.damage==0&&LaneClean(middle)&&hasPowerUp(PowerUps.BOOST, myCar.powerups)&& myCar.boostCounter==0){
             return new BoostCommand();
         }
         if (myCar.position.block<opponent.position.block&&hasPowerUp(PowerUps.EMP, myCar.powerups)){
@@ -84,10 +97,11 @@ public class Bot {
         if (hasPowerUp(PowerUps.OIL, myCar.powerups)){
             return new OilCommand();
         }
-        */
+
         if (hasPowerUp(PowerUps.TWEET, myCar.powerups)){
             return new TweetCommand(opponent.position.lane,opponent.position.block+opponent.speed+1);
         }
+        */
 
         //obstacle logic (wall handled above)
         //1. if all three lanes has walls, check for lizard
@@ -117,6 +131,11 @@ public class Bot {
             //all hopes lost, use lizard
             if(hasPowerUp(PowerUps.LIZARD, myCar.powerups))return new LizardCommand();
             //otherwise, just surrender
+        }
+
+        //Tweet Logic
+        if (hasPowerUp(PowerUps.TWEET, myCar.powerups) && myCar.speed>=8){
+            return new TweetCommand(opponent.position.lane,opponent.position.block+opponent.speed+1); // bagusnya + 1/2/3 ?
         }
 
         //Oil Logic
