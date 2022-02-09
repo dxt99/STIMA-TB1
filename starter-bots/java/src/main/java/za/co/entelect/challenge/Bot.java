@@ -87,7 +87,8 @@ public class Bot {
         if (myCar.damage==0&&LaneClean(middle)&&hasPowerUp(PowerUps.BOOST, myCar.powerups)&& myCar.boostCounter==0){
             return new BoostCommand();
         }
-        if (myCar.position.block<opponent.position.block&&hasPowerUp(PowerUps.EMP, myCar.powerups)){
+
+        if (myCar.position.block<opponent.position.block&&hasPowerUp(PowerUps.EMP, myCar.powerups)&&Math.abs(myCar.position.lane-opponent.position.lane)<=1){
             return new EmpCommand();
         }
 
@@ -128,7 +129,10 @@ public class Bot {
 
         //Oil Logic
         //1. Max speed and has powerup
-        if((myCar.speed==9||myCar.speed==15)&&hasPowerUp(PowerUps.OIL, myCar.powerups)){
+        /*if((myCar.speed==9||myCar.speed==15)&&hasPowerUp(PowerUps.OIL, myCar.powerups)){
+            return new OilCommand();
+        }*/
+        if(hasPowerUp(PowerUps.OIL, myCar.powerups) && opponent.position.lane == myCar.position.lane && opponent.position.block == myCar.position.block - 1){
             return new OilCommand();
         }
 
