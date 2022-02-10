@@ -53,8 +53,12 @@ public class Bot {
         if(IsCrashing()&&hasPowerUp(PowerUps.LIZARD, myCar.powerups))return new LizardCommand();
 
         //basic fix logic (ada temporary addon, sepertinya tambah cepat)
-        if(myCar.damage >= 3)return new FixCommand();
-        if(myCar.damage>=1&&hasPowerUp(PowerUps.BOOST, myCar.powerups))return new FixCommand();
+        if(myCar.damage >= 3){
+            return new FixCommand();
+        }
+        if(myCar.damage>=1&&hasPowerUp(PowerUps.BOOST, myCar.powerups)){
+            return new FixCommand();
+        }
 
         //wall avoidance logic:
         //1. continue if lane doesn't contain wall
@@ -79,7 +83,7 @@ public class Bot {
             }
             if(!right.contains(Terrain.WALL))return new ChangeLaneCommand(1);
             if(!left.contains(Terrain.WALL))return new ChangeLaneCommand(0);
-            return new LizardCommand();
+            if(hasPowerUp(PowerUps.LIZARD, myCar.powerups))return new LizardCommand();
         }
 
         //default power ups usage, delete later
