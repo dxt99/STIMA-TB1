@@ -64,8 +64,8 @@ public class Bot {
         //1. continue if lane doesn't contain wall
         //2. turn left/right immediately if lane is empty
         //3. use lizard (avoids wall)
-        // edge case: all wall
-        if(middle.contains(Terrain.WALL)){
+        // edge case: all wall, speed=0
+        if(myCar.speed>0&&middle.contains(Terrain.WALL)){
             if(!(right.contains(Terrain.WALL)||left.contains(Terrain.WALL))){
                 //checks for power up
                 if(right.contains(Terrain.BOOST))return new ChangeLaneCommand(1);
@@ -81,9 +81,11 @@ public class Bot {
                 if(myCar.position.lane==1||myCar.position.lane==2)return new ChangeLaneCommand(1);
                 return new ChangeLaneCommand(0);
             }
+            if(LaneClean(right))return new ChangeLaneCommand(1);
+            if(LaneClean(left))return new ChangeLaneCommand(0);
+            if(hasPowerUp(PowerUps.LIZARD, myCar.powerups))return new LizardCommand();
             if(!right.contains(Terrain.WALL))return new ChangeLaneCommand(1);
             if(!left.contains(Terrain.WALL))return new ChangeLaneCommand(0);
-            if(hasPowerUp(PowerUps.LIZARD, myCar.powerups))return new LizardCommand();
         }
 
         //default power ups usage, delete later
@@ -92,18 +94,18 @@ public class Bot {
             return new BoostCommand();
         }
 
+        /* moved temporarily
         if (myCar.position.block<opponent.position.block&&hasPowerUp(PowerUps.EMP, myCar.powerups)&&Math.abs(myCar.position.lane-opponent.position.lane)<=1){
             return new EmpCommand();
         }
+         */
 
         //obstacle logic (wall handled above)
-        //1. if all three lanes has walls, check for lizard
+        //1. if speed=0, just continue
         //2. continue if lane is clean and not crashing to opponent
         //3. if exists clean lane (left/right), steer
         //4. use lizard if no clean lane, if none just accel
-        if(middle.contains(Terrain.WALL)&&left.contains(Terrain.WALL)&&right.contains(Terrain.WALL)&&hasPowerUp(PowerUps.LIZARD, myCar.powerups)){
-               return new LizardCommand();
-        }else if(!LaneClean(middle)){
+        if(!LaneClean(middle)&&myCar.speed>0){
             if(LaneClean(left)&&LaneClean(right)&&!IsCrashing()){
                 //checks for power up
                 if(right.contains(Terrain.BOOST))return new ChangeLaneCommand(1);
@@ -125,7 +127,10 @@ public class Bot {
             if(hasPowerUp(PowerUps.LIZARD, myCar.powerups))return new LizardCommand();
             //otherwise, just surrender
         }
-
+        //Temporary emp priority change
+        if (myCar.position.block<opponent.position.block&&hasPowerUp(PowerUps.EMP, myCar.powerups)&&Math.abs(myCar.position.lane-opponent.position.lane)<=1){
+            return new EmpCommand();
+        }
         //Tweet Logic
         if (hasPowerUp(PowerUps.TWEET, myCar.powerups) && myCar.speed>=8){
             return new TweetCommand(opponent.position.lane,opponent.position.block+opponent.speed+1); // bagusnya + 1/2/3 ?
@@ -133,10 +138,10 @@ public class Bot {
 
         //Oil Logic
         //1. Max speed and has powerup
-        /*if((myCar.speed==9||myCar.speed==15)&&hasPowerUp(PowerUps.OIL, myCar.powerups)){
+        if((myCar.speed==9||myCar.speed==15)&&hasPowerUp(PowerUps.OIL, myCar.powerups)){
             return new OilCommand();
-        }*/
-        if(hasPowerUp(PowerUps.OIL, myCar.powerups) && opponent.position.lane == myCar.position.lane && opponent.position.block == myCar.position.block - 1){
+        }
+        if((myCar.speed==9||myCar.speed==15)&&hasPowerUp(PowerUps.OIL, myCar.powerups) && opponent.position.lane == myCar.position.lane && opponent.position.block == myCar.position.block - 1){
             return new OilCommand();
         }
 
@@ -155,6 +160,9 @@ public class Bot {
         List<Object> blocks = new ArrayList<>();
         int startBlock = map.get(0)[0].position.block;
 
+
+        //Returns null if speed is 0
+        if(speed<=0)return blocks;
         //Returns if lane is not valid
         if(lane<1||lane>4){
             blocks.add(Terrain.WALL);
