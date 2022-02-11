@@ -33,8 +33,8 @@ public class Bot {
 
     public Command run() {
         List<Object> middle = getBlocksInFront(myCar.position.lane, myCar.position.block, myCar.speed);
-        List<Object> right  = getBlocksInFront(myCar.position.lane+1, myCar.position.block, myCar.speed-1);
-        List<Object> left  = getBlocksInFront(myCar.position.lane-1, myCar.position.block, myCar.speed-1);
+        List<Object> right  = getBlocksInFront(myCar.position.lane+1, myCar.position.block-1, myCar.speed-1);
+        List<Object> left  = getBlocksInFront(myCar.position.lane-1, myCar.position.block-1, myCar.speed-1);
 
         // boosting logic
         if (myCar.boostCounter > 0){

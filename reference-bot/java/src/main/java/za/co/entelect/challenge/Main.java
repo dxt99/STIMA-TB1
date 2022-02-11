@@ -15,8 +15,7 @@ public class Main {
     private static final String STATE_FILE_NAME = "state.json";
 
     /**
-     * Read the current state, feed it to the bot, get the output and print it to
-     * stdout
+     * Read the current state, feed it to the bot, get the output and print it to stdout
      *
      * @param args the args
      **/
@@ -24,9 +23,9 @@ public class Main {
 
         Scanner sc = new Scanner(System.in);
         Gson gson = new Gson();
-        Bot bot = new Bot();
+        Random random = new Random(System.nanoTime());
 
-        while (true) {
+        while(true) {
             try {
                 int roundNumber = sc.nextInt();
 
@@ -34,7 +33,7 @@ public class Main {
                 String state = new String(Files.readAllBytes(Paths.get(statePath)));
 
                 GameState gameState = gson.fromJson(state, GameState.class);
-                Command command = bot.run(gameState);
+                Command command = new Bot(random, gameState).run();
 
                 System.out.println(String.format("C;%d;%s", roundNumber, command.render()));
             } catch (Exception e) {
@@ -43,3 +42,4 @@ public class Main {
         }
     }
 }
+
