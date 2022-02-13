@@ -11,7 +11,7 @@
 - Oil Logic (musuh dibelakang and speed 8/9 atau max speed) 3
 - Accelerate anyways
 
-## Greedy Bot v2 Changlog (currently in reference)
+## Greedy Bot v2 Changelog (currently in reference)
 ### quality of life:
 	- moved a lot of stuff to functions
 
