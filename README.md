@@ -1,4 +1,4 @@
-## Greedy Bot 1.0 Logic
+## Greedy Bot v1 Logic (currently in starter)
 ### Priority Order:
 - Boost State Logic (sedang boosting, avoid every obs, use lizard if necessary) 1
 - Fix Logic (damage >=3 langsung fix) 1
@@ -11,8 +11,21 @@
 - Oil Logic (musuh dibelakang and speed 8/9 atau max speed) 3
 - Accelerate anyways
 
-### Obstacle Logic (in general): 
-- Avoid Wall/Mud/Oil = keluarin list of possible outcomes, wall priority
-- Get powerup where available = choose best possible from above
-- Lizard = kalo list diatas kosong, just use lizard
-- else do nothing
+## Greedy Bot v2 Changlog (currently in reference)
+### quality of life:
+	- moved a lot of stuff to functions
+
+### bot logic:
+	- added do nothing and decelerate conditions (pretty damn useful)
+	- improved map reading (projected accel path, projected decel path, projected boost path)
+	- improved cybertruck logic (makes it impossible for self-crashing)
+	- improved mud tanking logic
+
+### known bugs:
+	- emp spamming when desperate
+	- turning into opponent
+
+### possible improvements:
+	- block opponent movement (turn into their lane)
+	- improve emp logic (when opponent is boosting, etc.)
+	- use boost for selfish gains when desperate (boost to max speed when damage>0)
