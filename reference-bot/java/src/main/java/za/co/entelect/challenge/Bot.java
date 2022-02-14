@@ -208,11 +208,8 @@ public class Bot {
     private Command UsePower(PowerUps P){
         if(P.equals(PowerUps.EMP))
             return new EmpCommand();
-        if(P.equals(PowerUps.TWEET)) {
-            //prevent crashing into your tweet now
-            if (opponent.position.lane != myCar.position.lane || opponent.position.block < myCar.position.block || opponent.position.block + opponent.speed + 3 > myCar.position.block + myCar.speed){
-                return new TweetCommand(opponent.position.lane, opponent.position.block + opponent.speed + 3);
-            }
+        if(P.equals(PowerUps.TWEET) && (opponent.position.lane != myCar.position.lane || opponent.position.block < myCar.position.block || opponent.position.block + opponent.speed + 3 > myCar.position.block + myCar.speed)) {
+            return new TweetCommand(opponent.position.lane, opponent.position.block + opponent.speed + 3);
             /*int tar = opponent.position.block + 3;
             //just tweet to his side if gonna crash
             if (tar - myCar.position.block <= myCar.speed && tar >= myCar.position.block) {
