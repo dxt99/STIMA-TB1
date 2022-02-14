@@ -69,8 +69,11 @@ public class Bot {
             return new BoostCommand();
         }
 
+        //gas if speed=0
+        if(myCar.speed==0)return new AccelerateCommand();
+
         //if car will crash when accel, but won't if not, try power ups
-        if(LaneClean(middle)&&!LaneClean(middleAcc)&&myCar.speed>0){
+        if(LaneClean(middle)&&!LaneClean(middleAcc)){
             PowerUps P = TryPower();
             if(P!=null)return UsePower(P);
         }
@@ -82,7 +85,7 @@ public class Bot {
         3. if exists clean lane (left/right), steer
         4. use lizard if no clean lane, if none just accel
         */
-        if(!LaneClean(middleAcc)&&myCar.speed>0){
+        if(!LaneClean(middleAcc)){
             if(LaneClean(left)&&LaneClean(right)){
                 //checks for power up
                 return PowerGreed(left,right);
@@ -102,8 +105,9 @@ public class Bot {
             if(hasPowerUp(PowerUps.LIZARD))return new LizardCommand();
 
 
-            //otherwise, avoid wall
-            if(Tankable(middle)&&myCar.speed<6&&myCar.damage<2&&hasPowerUp(PowerUps.BOOST))return new BoostCommand();
+            //otherwise, avoid wall, or take least amount of damage while preserving speed
+            if(Tankable(middleBoost)&&myCar.speed<6&&myCar.damage<2&&hasPowerUp(PowerUps.BOOST)&&myCar.boostCounter==0)return new BoostCommand();
+            if(Tankable(middleAcc)&&myCar.damage<2)return new AccelerateCommand();
             if(!Tankable(middle)&&Tankable(left)&&Tankable(right))return PowerGreed(left,right);
             if(!Tankable(middle)&&Tankable(right))return new ChangeLaneCommand(1);
             if(!Tankable(middle)&&Tankable(left))return new ChangeLaneCommand(0);
@@ -202,7 +206,7 @@ public class Bot {
             return PowerUps.EMP;
         }
         //Tweet Logic
-        if (hasPowerUp(PowerUps.TWEET) && myCar.speed>=8){
+        if (hasPowerUp(PowerUps.TWEET) && myCar.speed>=6){
             return PowerUps.TWEET;
         }
 
@@ -237,6 +241,7 @@ public class Bot {
     private int NextSpeed(){
         int s=myCar.speed;
         if(s==5)return 6;
+        if(s==15)return 15;
         int[] speeds= new int[]{0, 3, 6, 8, 9, 15};
         int ret=0;
         for(int i=0;i<4;i++)if(s==speeds[i])ret=speeds[i+1];
