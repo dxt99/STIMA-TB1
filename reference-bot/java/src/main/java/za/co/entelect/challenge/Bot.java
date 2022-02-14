@@ -41,7 +41,7 @@ public class Bot {
 
         // Greedy
         if (myCar.boostCounter > 0){ // boosting logic
-            if (!LaneClean(middle)) {
+            if (!LaneClean(middleBoost)) {
                 if(LaneClean(left)&&LaneClean(right))return PowerGreed(left,right);
                 else if (LaneClean(right)) {
                     return new ChangeLaneCommand(1);
