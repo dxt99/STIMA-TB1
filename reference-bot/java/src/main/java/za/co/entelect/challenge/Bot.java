@@ -189,7 +189,7 @@ public class Bot {
             return PowerUps.EMP;
         }
         //Tweet Logic
-        if (hasPowerUp(PowerUps.TWEET) && myCar.speed>=6){
+        if ((hasPowerUp(PowerUps.TWEET) && myCar.speed>=6)&&(opponent.position.lane != myCar.position.lane || opponent.position.block < myCar.position.block || opponent.position.block + opponent.speed + 3 > myCar.position.block + myCar.speed)){
             return PowerUps.TWEET;
         }
 
@@ -208,7 +208,7 @@ public class Bot {
     private Command UsePower(PowerUps P){
         if(P.equals(PowerUps.EMP))
             return new EmpCommand();
-        if(P.equals(PowerUps.TWEET) && (opponent.position.lane != myCar.position.lane || opponent.position.block < myCar.position.block || opponent.position.block + opponent.speed + 3 > myCar.position.block + myCar.speed)) {
+        if(P.equals(PowerUps.TWEET) ) {
             return new TweetCommand(opponent.position.lane, opponent.position.block + opponent.speed + 3);
             /*int tar = opponent.position.block + 3;
             //just tweet to his side if gonna crash
