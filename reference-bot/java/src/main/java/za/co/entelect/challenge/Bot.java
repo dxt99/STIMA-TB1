@@ -37,9 +37,10 @@ public class Bot {
         List<Object> middleDec = getBlocksInFront(myCar.position.lane, myCar.position.block, PrevSpeed());
         List<Object> right  = getBlocksInFront(myCar.position.lane+1, myCar.position.block-1, myCar.speed);
         List<Object> left  = getBlocksInFront(myCar.position.lane-1, myCar.position.block-1, myCar.speed);
+        PowerUps P = TryPower();
 
-        // boosting logic
-        if (myCar.boostCounter > 0){
+        // Greedy
+        if (myCar.boostCounter > 0){ // boosting logic
             if (!LaneClean(middle)) {
                 if(LaneClean(left)&&LaneClean(right))return PowerGreed(left,right);
                 else if (LaneClean(right)) {
@@ -50,72 +51,50 @@ public class Bot {
                     return new LizardCommand();
                 }
             }
-        }
-
-        //lizard logic if tailing opponent
-        if(IsCrashing()&&hasPowerUp(PowerUps.LIZARD))return new LizardCommand();
-
-        //basic fix logic (ada temporary addon, sepertinya tambah cepat)
-        if(myCar.damage >= 3){
+        } else if(IsCrashing() && hasPowerUp(PowerUps.LIZARD)){ //lizard logic if tailing opponent
+            return new LizardCommand();
+        } else if(myCar.damage >= 3){ // fix logic 1
             return new FixCommand();
-        }
-        if(myCar.damage>=1&&hasPowerUp(PowerUps.BOOST)) {
+        } else if(myCar.damage>=1 && hasPowerUp(PowerUps.BOOST)) { // fix logic 2 (to boost)
             return new FixCommand();
-        }
-
-        //default power ups usage, delete later
-
-        if(myCar.damage==0&&LaneClean(middleBoost)&&hasPowerUp(PowerUps.BOOST)&& myCar.boostCounter==0){
+        } else if(myCar.damage==0 && LaneClean(middleBoost) && hasPowerUp(PowerUps.BOOST) && myCar.boostCounter==0){ // boost logic
             return new BoostCommand();
-        }
-
-        //gas if speed=0
-        if(myCar.speed==0)return new AccelerateCommand();
-
-        //if car will crash when accel, but won't if not, try power ups
-        if(LaneClean(middle)&&!LaneClean(middleAcc)){
-            PowerUps P = TryPower();
-            if(P!=null)return UsePower(P);
-        }
-
-        /*
-        obstacle logic (wall handled above)
-        1. won't crash when accel, continue
-        2. if exists clean lane (left/right), steer
-        3. use lizard if no clean lane, if none just accel
-        4. avoid wall, tank if necessary
-        */
-        if(!LaneClean(middleAcc)){
-            if(LaneClean(left)&&LaneClean(right)){
+        } else if(myCar.speed==0){ // gas if speed 0
+            return new AccelerateCommand();
+        } else if(LaneClean(middle) && !LaneClean(middleAcc)){ //if car will crash when accel, but won't if not, try power ups
+            if(P!=null){
+                return UsePower(P);
+            }
+        } else if(!LaneClean(middleAcc)){ // obstacle logic (wall handled above)
+            //1. won't crash when accel, continue
+            //2. if exists clean lane (left/right), steer
+            //3. use lizard if no clean lane, if none just accel
+            //4. avoid wall, tank if necessary
+            if(LaneClean(left) && LaneClean(right)){ // 2
                 //checks for power up
                 return PowerGreed(left,right);
-            }
-            //if "do nothing" works, check for power up or do nothing
-            if(LaneClean(middle)){
-                PowerUps P=TryPower();
-                if(P!=null)return UsePower(P);
+            } else if(LaneClean(middle)){ // if "do nothing" works
                 return new DoNothingCommand();
+            } else if(LaneClean(left)){ // steer left
+                return new ChangeLaneCommand(0);
+            } else if(LaneClean(right)){ // steer right
+                return new ChangeLaneCommand(1);
+            } else if(myCar.speed>6&&LaneClean(middleDec)){ // try decelerate
+                return new DecelerateCommand();
+            } else if(hasPowerUp(PowerUps.LIZARD)){ // last hope, use lizard
+                return new LizardCommand();
+            } else if(Tankable(middleAcc)&&myCar.damage<2){ // try preserve speed
+                return new AccelerateCommand();
+            } else if(!Tankable(middle)&&Tankable(left)&&Tankable(right)){ // try taking advantage
+                return PowerGreed(left,right);
+            } else if(!Tankable(middle)&&Tankable(right)){ // try taking less damage
+                return new ChangeLaneCommand(1);
+            } else if(!Tankable(middle)&&Tankable(left)){ // try taking less damage
+                return new ChangeLaneCommand(0);
             }
-            //otherwise, try steering
-            if(LaneClean(left))return new ChangeLaneCommand(0);
-            if(LaneClean(right))return new ChangeLaneCommand(1);
-            //try "decelerate"
-            if(myCar.speed>6&&LaneClean(middleDec))return new DecelerateCommand();
-            //all hopes lost, use lizard
-            if(hasPowerUp(PowerUps.LIZARD))return new LizardCommand();
-
-
-            //otherwise, avoid wall, or take the least amount of damage while preserving speed
-            if(Tankable(middleBoost)&&myCar.speed<6&&myCar.damage<2&&hasPowerUp(PowerUps.BOOST)&&myCar.boostCounter==0)return new BoostCommand();
-            if(Tankable(middleAcc)&&myCar.damage<2)return new AccelerateCommand();
-            if(!Tankable(middle)&&Tankable(left)&&Tankable(right))return PowerGreed(left,right);
-            if(!Tankable(middle)&&Tankable(right))return new ChangeLaneCommand(1);
-            if(!Tankable(middle)&&Tankable(left))return new ChangeLaneCommand(0);
+        } else if (P!=null) { // has power up
+            return UsePower(P);
         }
-
-        PowerUps P=TryPower();
-        if(P!=null)return UsePower(P);
-
         //just floor the pedal
         return new AccelerateCommand();
     }

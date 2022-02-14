@@ -36,8 +36,8 @@ public class Bot {
         List<Object> right  = getBlocksInFront(myCar.position.lane+1, myCar.position.block-1, myCar.speed);
         List<Object> left  = getBlocksInFront(myCar.position.lane-1, myCar.position.block-1, myCar.speed);
 
-        // boosting logic
-        if (myCar.boostCounter > 0){
+        // Greedy
+        if (myCar.boostCounter > 0) { // boosting logic
             if (!LaneClean(middle)) {
                 if (LaneClean(right)) {
                     return new ChangeLaneCommand(1);
@@ -47,25 +47,17 @@ public class Bot {
                     return new LizardCommand();
                 }
             }
-        }
-
-        //lizard logic if tailing opponent
-        if(IsCrashing()&&hasPowerUp(PowerUps.LIZARD, myCar.powerups))return new LizardCommand();
-
-        //basic fix logic (ada temporary addon, sepertinya tambah cepat)
-        if(myCar.damage >= 3){
+        } else if(IsCrashing() && hasPowerUp(PowerUps.LIZARD, myCar.powerups)){ //lizard logic if tailing opponent
+            return new LizardCommand();
+        } else if(myCar.damage >= 3) { // fix logic 1
             return new FixCommand();
-        }
-        if(myCar.damage>=1&&hasPowerUp(PowerUps.BOOST, myCar.powerups)){
+        } else if(myCar.damage>=1 && hasPowerUp(PowerUps.BOOST, myCar.powerups)){ // fix logic 2 (to boost)
             return new FixCommand();
-        }
-
-        //wall avoidance logic:
-        //1. continue if lane doesn't contain wall
-        //2. turn left/right immediately if lane is empty
-        //3. use lizard (avoids wall)
-        // edge case: all wall, speed=0
-        if(myCar.speed>0&&middle.contains(Terrain.WALL)){
+        } else if(myCar.speed>0 && middle.contains(Terrain.WALL)){ // wall avoidance logic
+            //1. continue if lane doesn't contain wall
+            //2. turn left/right immediately if lane is empty
+            //3. use lizard (avoids wall)
+            // edge case: all wall, speed=0
             if(!(right.contains(Terrain.WALL)||left.contains(Terrain.WALL))){
                 //checks for power up
                 if(right.contains(Terrain.BOOST))return new ChangeLaneCommand(1);
@@ -80,12 +72,17 @@ public class Bot {
                 if(left.contains(Terrain.OIL_POWER))return new ChangeLaneCommand(0);
                 if(myCar.position.lane==1||myCar.position.lane==2)return new ChangeLaneCommand(1);
                 return new ChangeLaneCommand(0);
+            } else if(LaneClean(right)){
+                return new ChangeLaneCommand(1);
+            } else if(LaneClean(left)){
+                return new ChangeLaneCommand(0);
+            } else if(hasPowerUp(PowerUps.LIZARD, myCar.powerups)){
+                return new LizardCommand();
+            } else if(!right.contains(Terrain.WALL)){
+                return new ChangeLaneCommand(1);
+            } else if(!left.contains(Terrain.WALL)){
+                return new ChangeLaneCommand(0);
             }
-            if(LaneClean(right))return new ChangeLaneCommand(1);
-            if(LaneClean(left))return new ChangeLaneCommand(0);
-            if(hasPowerUp(PowerUps.LIZARD, myCar.powerups))return new LizardCommand();
-            if(!right.contains(Terrain.WALL))return new ChangeLaneCommand(1);
-            if(!left.contains(Terrain.WALL))return new ChangeLaneCommand(0);
         }
 
         //default power ups usage, delete later
