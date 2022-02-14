@@ -80,10 +80,10 @@ public class Bot {
 
         /*
         obstacle logic (wall handled above)
-        1. if speed=0, just continue
-        2. continue if lane is clean and not crashing to opponent
-        3. if exists clean lane (left/right), steer
-        4. use lizard if no clean lane, if none just accel
+        1. won't crash when accel, continue
+        2. if exists clean lane (left/right), steer
+        3. use lizard if no clean lane, if none just accel
+        4. avoid wall, tank if necessary
         */
         if(!LaneClean(middleAcc)){
             if(LaneClean(left)&&LaneClean(right)){
@@ -105,7 +105,7 @@ public class Bot {
             if(hasPowerUp(PowerUps.LIZARD))return new LizardCommand();
 
 
-            //otherwise, avoid wall, or take least amount of damage while preserving speed
+            //otherwise, avoid wall, or take the least amount of damage while preserving speed
             if(Tankable(middleBoost)&&myCar.speed<6&&myCar.damage<2&&hasPowerUp(PowerUps.BOOST)&&myCar.boostCounter==0)return new BoostCommand();
             if(Tankable(middleAcc)&&myCar.damage<2)return new AccelerateCommand();
             if(!Tankable(middle)&&Tankable(left)&&Tankable(right))return PowerGreed(left,right);
@@ -120,12 +120,12 @@ public class Bot {
         return new AccelerateCommand();
     }
 
-    /**
+    /*
      * Returns map of blocks and the objects in the for the current lanes, returns the amount of blocks that can be
      * traversed at max speed.
      * Returns wall if lane is not valid
      * Treats CyberTrucks as walls
-     **/
+     */
     private List<Object> getBlocksInFront(int lane, int block,int speed) {
         List<Lane[]> map = gameState.lanes;
         List<Object> blocks = new ArrayList<>();
@@ -168,11 +168,13 @@ public class Bot {
         return true;
     }
 
+    // Checks if lane is tankable
     private boolean Tankable(List<Object> LaneBlocks){
         if(LaneBlocks.contains(Terrain.WALL))return false;
         return MudCount(LaneBlocks) < 2;
     }
 
+    // Counts mud and oil in a lane
     private int MudCount(List<Object> LaneBlocks){
         int ret=0;
         for(Object L:LaneBlocks)if(L.equals(Terrain.MUD)||L.equals(Terrain.OIL_SPILL))ret++;
@@ -186,6 +188,7 @@ public class Bot {
         return same&&(dist<=myCar.speed-opponent.speed);
     }
 
+    // Greedy power up in left or right lane
     private Command PowerGreed(List<Object> left, List<Object> right){
         if(right.contains(Terrain.BOOST))return new ChangeLaneCommand(1);
         if(left.contains(Terrain.BOOST))return new ChangeLaneCommand(0);
@@ -201,6 +204,7 @@ public class Bot {
         return new ChangeLaneCommand(0);
     }
 
+    // Emp, Tweet, and Oil logic
     private PowerUps TryPower(){
         if (myCar.position.block<opponent.position.block&&hasPowerUp(PowerUps.EMP)&&Math.abs(myCar.position.lane-opponent.position.lane)<=1){
             return PowerUps.EMP;
@@ -221,6 +225,7 @@ public class Bot {
         return null;
     }
 
+    // Use power up P
     private Command UsePower(PowerUps P){
         if(P.equals(PowerUps.EMP))
             return new EmpCommand();
@@ -238,6 +243,7 @@ public class Bot {
         return new OilCommand();
     }
 
+    // gets speed if accel
     private int NextSpeed(){
         int s=myCar.speed;
         if(s==5)return 6;
@@ -250,6 +256,7 @@ public class Bot {
         return ret;
     }
 
+    // gets speed if decel
     private int PrevSpeed(){
         int s=myCar.speed;
         if(s==5)return 3;
